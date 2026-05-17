@@ -1,0 +1,19 @@
+{
+  "name": "project-atlas-control",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @atlas/core -w @atlas/storage -w @atlas/orchestrator -w @atlas/api -w @atlas/web",
+    "dev": "npm run dev -w @atlas/api",
+    "dev:web": "npm run dev -w @atlas/web",
+    "migrate": "npm run migrate -w @atlas/storage",
+    "orchestrate": "npm run orchestrate -w @atlas/api",
+    "start": "npm run start -w @atlas/api"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

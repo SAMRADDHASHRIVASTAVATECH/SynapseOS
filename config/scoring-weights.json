@@ -1,0 +1,24 @@
+{
+  "components": {
+    "intent_match": 0.22,
+    "domain_match": 0.12,
+    "complexity_match": 0.14,
+    "tool_match": 0.12,
+    "safety_match": 0.16,
+    "workflow_fit": 0.12,
+    "output_fit": 0.08,
+    "memory_relevance": 0.04
+  },
+  "tieBreakOrder": [
+    "safety",
+    "debug",
+    "review",
+    "build",
+    "research",
+    "multi_agent",
+    "creative",
+    "individual"
+  ],
+  "minConfidence": 0.35,
+  "globalFallbackMode": "individual"
+}

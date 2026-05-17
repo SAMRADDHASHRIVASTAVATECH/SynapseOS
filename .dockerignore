@@ -1,0 +1,12 @@
+node_modules
+packages/*/node_modules
+packages/*/dist
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+.env
+.DS_Store
+.git
+*.tsbuildinfo
+packages/*/*.tsbuildinfo

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  atlas-control:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: project-atlas-control:latest
+    container_name: atlas-control
+    ports:
+      - "3847:3847"
+    volumes:
+      - atlas-data:/app/data
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+
+volumes:
+  atlas-data:
+    name: atlas-control-data

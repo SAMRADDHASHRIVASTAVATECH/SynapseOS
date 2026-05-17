@@ -1,0 +1,2 @@
+-- Atlas Control initial schema (applied via @atlas/storage migrate)
+-- See packages/storage/src/schema.ts for canonical definition

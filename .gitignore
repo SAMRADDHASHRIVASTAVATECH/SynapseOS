@@ -1,0 +1,7 @@
+node_modules/
+dist/
+data/atlas.db
+data/atlas.db-*
+*.log
+.DS_Store
+packages/web/dist/
