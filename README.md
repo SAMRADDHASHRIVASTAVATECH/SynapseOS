@@ -1,3 +1,6 @@
+# Atlas Control — Updated Container-Native README
+
+```md
 <div align="center">
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -73,7 +76,7 @@
 
 **Docker Desktop is the only thing you need to run Atlas Control.**
 
-No Node.js. No npm. No manual installs. Docker handles everything.
+No Node.js. No npm. No manual installs on the host machine. Docker now runs both the backend API and the frontend dashboard inside isolated containers, so the full stack stays container-native and reproducible.
 
 Download Docker Desktop → https://www.docker.com/products/docker-desktop/
 
@@ -89,14 +92,17 @@ Open a terminal in the project root folder and run:
 docker compose up --build
 ```
 
-This builds and starts all services automatically. Wait for the logs to show both services ready, then open:
+This builds and starts both services automatically:
+
+- **atlas-control** → backend API container
+- **atlas-dashboard** → frontend Vite/React container
+
+Wait for the logs to show both services ready, then open:
 
 - **Dashboard (UI):** http://localhost:5173
 - **API:** http://localhost:3847
 
-That's it. Atlas Control is running.
-
----
+That's it. Atlas Control is running fully inside Docker.
 
 ### Stop everything
 
@@ -115,6 +121,17 @@ for /f %i in ('docker ps -aq') do docker rm -f %i
 
 ---
 
+## ◈ CONTAINER-NATIVE SERVICE LAYOUT
+
+| Service | Container | Purpose |
+|---------|-----------|---------|
+| API | `atlas-control` | Runs the Express backend, orchestration engine, SQLite migrations, and execution pipeline |
+| Dashboard | `atlas-dashboard` | Runs the Vite + React frontend, proxying `/api` traffic to the backend over the Docker network |
+
+The frontend container uses Vite with `host: '0.0.0.0'` so it is reachable from the host machine, and the API proxy points to `http://atlas-control:3847` so browser requests flow cleanly across the Docker bridge.
+
+---
+
 ## ◈ WHAT IS ATLAS CONTROL
 
 **Project Atlas Control** is an offline-first, deterministic mode-assignment and workflow-orchestration engine. It intercepts raw developer intent, scores eight execution modes through a weighted cognition engine, decomposes work into parallel agent tasks, validates outputs before merge, enforces security gates, and returns fully observable, traced, synthesized results — all in under 50ms on the routing path.
@@ -124,10 +141,6 @@ Every decision is explainable. Every trace is persisted. Every failure is handle
 Built as a TypeScript monorepo with SQLite persistence, an Express REST API on port 3847, and a React trace dashboard on port 5173.
 
 ---
-
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<!--                     GITHUB STATS                               -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
 
 <div align="center">
 
@@ -139,26 +152,6 @@ Built as a TypeScript monorepo with SQLite persistence, an Express REST API on p
 <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=YOUR_GITHUB_USERNAME&layout=compact&langs_count=8&theme=chartreuse-dark&hide_border=true&bg_color=0a0a0a&title_color=00ff88&text_color=ffffff"/>
 
 <img src="https://github-readme-streak-stats.herokuapp.com/?user=YOUR_GITHUB_USERNAME&theme=dark&hide_border=true&background=0a0a0a&ring=00ff88&fire=ff6600&currStreakLabel=00ccff&sideLabels=ffffff&currStreakNum=ffffff&sideNums=ffffff&dates=888888"/>
-
-</div>
-
----
-
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<!--              SNAKE CONTRIBUTION ANIMATION                      -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
-
-<div align="center">
-
-### ◈ CONTRIBUTION MESH
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_GITHUB_USERNAME/output/github-contribution-grid-snake-dark.svg"/>
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_GITHUB_USERNAME/output/github-contribution-grid-snake.svg"/>
-  <img alt="snake animation" src="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_GITHUB_USERNAME/output/github-contribution-grid-snake-dark.svg"/>
-</picture>
-
-<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%"/>
 
 </div>
 
@@ -177,31 +170,13 @@ Built as a TypeScript monorepo with SQLite persistence, an Express REST API on p
 
 **Base:** `http://localhost:3847`
 
-| Method | Endpoint           | Description                       |
-|--------|--------------------|-----------------------------------|
-| GET    | `/api/health`      | Health check                      |
-| GET    | `/api/modes`       | Full mode registry                |
-| POST   | `/api/orchestrate` | Run full six-tier pipeline        |
-| GET    | `/api/history`     | List persisted orchestration runs |
-| GET    | `/api/history/:id` | Full request + all trace rows     |
-
-**POST /api/orchestrate — Request Body:**
-
-```json
-{
-  "prompt": "string (required)",
-  "manualOverride": "build",
-  "sessionId": "optional"
-}
-```
-
-**cURL example (Windows):**
-
-```cmd
-curl -s -X POST http://localhost:3847/api/orchestrate ^
-  -H "Content-Type: application/json" ^
-  -d "{\"prompt\":\"Debug failing unit tests in payment module\"}"
-```
+| Method | Endpoint            | Description                       |
+|--------|---------------------|-----------------------------------|
+| GET    | `/api/health`       | Health check                      |
+| GET    | `/api/modes`        | Full mode registry                |
+| POST   | `/api/orchestrate`  | Run full six-tier pipeline        |
+| GET    | `/api/history`      | List persisted orchestration runs |
+| GET    | `/api/history/:id`  | Full request + all trace rows     |
 
 ---
 
@@ -224,6 +199,10 @@ curl -s -X POST http://localhost:3847/api/orchestrate ^
 
 **Containers won't start** — Make sure Docker Desktop is open and running before running `docker compose up --build`.
 
+**Frontend loads but `/api/*` calls fail** — Confirm `packages/web/vite.config.ts` proxies `/api` to `http://atlas-control:3847` and that the frontend container is started with `--host 0.0.0.0`.
+
+**Port already in use** — Something else is using port 3847 or 5173. Stop that process or change the ports in `docker-compose.yml`.
+
 **Port already in use** — Something else is using port 3847 or 5173. Stop that process or change the ports in `docker-compose.yml`.
 
 **Want a clean rebuild** — Run `docker compose down` first, then `docker compose up --build` again.
@@ -244,3 +223,5 @@ for /f %i in ('docker ps -aq') do docker rm -f %i
 ![Footer Wave](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,2,5,30&height=100&section=footer&animation=fadeIn)
 
 </div>
+```
+
